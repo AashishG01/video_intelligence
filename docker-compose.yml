@@ -1,0 +1,33 @@
+services:
+  # This runs your Face AI script
+  face-engine:
+    image: python:3.11-slim
+    container_name: face_engine
+    volumes:
+      - .:/app
+    working_dir: /app
+    network_mode: "host"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: >
+      sh -c "apt-get update && apt-get install -y libgl1 libglib2.0-0 build-essential cmake && 
+             pip install opencv-python-headless insightface onnxruntime-gpu chromadb && 
+             python live_embedding_gpu.py"
+
+  # This runs your UI Dashboard
+  face-ui:
+    image: python:3.11-slim
+    container_name: face_dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: >
+      sh -c "pip install streamlit chromadb pandas && 
+             streamlit run view_db.py"
