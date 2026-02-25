@@ -33,8 +33,7 @@ class VectorDB:
             
             # Loop through the top 3 to see if ANY of them are a match
             for i in range(len(distances)):
-                if distances[i] < threshold:
-                    return metadatas[i].get("person_id"), distances[i]
+                if distances[i] < threshold:es[i]
             
             # If we checked all 3 and none were below threshold, return None
             return None, distances[0] # Return closest distance for debugging

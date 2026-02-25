@@ -1,0 +1,169 @@
+# Virtual environment (Python backend)
+venv/
+env/
+.venv/
+ENV/
+
+# Python cache and bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py[cod]
+*$py.class
+
+# Large binaries (e.g., OpenCV libs in backend)
+*.so
+*.dll
+*.dylib
+
+# Node.js (common for frontend/backend)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# Frontend build outputs (e.g., React, Vue, Angular)
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+
+# Logs (backend/frontend)
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data (backend)
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul (backend testing)
+coverage/
+*.lcov
+
+# nyc test coverage (frontend/backend)
+.nyc_output
+
+# Dependency directories (backend-specific, e.g., if using pipenv or poetry)
+.pipenv/
+Pipfile.lock
+poetry.lock
+
+# Environment variables (backend/frontend - NEVER commit secrets!)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+*~
+
+# Temporary files
+*.tmp
+*.temp
+
+# Database files (if using local DB in backend)
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker (if containerizing backend/frontend)
+.dockerignore
+
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+
+# =========================
+# Virtual Environments
+# =========================
+venv/
+.env/
+.env.*
+
+# =========================
+# Node / Frontend
+# =========================
+node_modules/
+package-lock.json
+
+# =========================
+# Image & Video Data (PROJECT-SPECIFIC)
+# =========================
+captured_faces/
+extreme image/
+sample_img/
+Sample_videos/
+testing image/
+live_video_db/
+visual_audit_results/
+visual_audit_results_for_extreme/
+
+
+# Ignore all images & videos anywhere
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.gif
+*.tiff
+*.webp
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.flv
+*.wmv
+
+# =========================
+# Database / Model Outputs
+# =========================
+*.db
+*.h5
+*.pt
+*.pth
+*.onnx
+*.ckpt
+
+# =========================
+# Docker
+# =========================
+docker-compose.override.yml
+
+# =========================
+# VS Code / IDE
+# =========================
+.vscode/
+.idea/
+*.swp
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db

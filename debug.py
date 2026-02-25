@@ -15,6 +15,7 @@ import os
 RTSP_URL_1 = "rtsp://admin:admin@172.16.0.151:554/live.sdp" 
 RTSP_URL_2 = "rtsp://admin:admin@172.16.0.152:554/live.sdp" 
 
+
 # DEBUG CHANGE: Slowed down to 1 frame per second to make terminal readable
 PROCESS_INTERVAL = 1.0 
 
