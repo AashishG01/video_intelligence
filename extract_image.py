@@ -8,12 +8,12 @@ from insightface.app import FaceAnalysis
 # ==========================================
 
 
-VIDEO_PATH = "/home/user/Desktop/video surveillence/Sample_videos/Export__Mahidharpura Nr Temple Thoba Sheri_Friday February 20 2026114459  a430615.avi"  # <-- PUT YOUR VIDEO PATH HERE
-OUTPUT_FOLDER = "extreme image"
+VIDEO_PATH = "/home/user/Desktop/video surveillence/Sample_videos/Export__Rly Station-Towards Amisha Hotel Right_Friday February 20 2026114208  608d3f6.avi"  # <-- PUT YOUR VIDEO PATH HERE
+OUTPUT_FOLDER = "testing image day"
 
 PROCESS_EVERY_N_FRAMES = 10  # Extract a face every 10 frames
 CONFIDENCE_THRESHOLD = 0.35  # Ignore blurry/uncertain faces
-MIN_FACE_SIZE = 15          # Ignore faces smaller than 50x50 pixels
+MIN_FACE_SIZE = 50          # Ignore faces smaller than 50x50 pixels
 PADDING_RATIO = 0.2          # Add 20% padding around the face for a better crop
 
 # ==========================================

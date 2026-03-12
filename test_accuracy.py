@@ -8,7 +8,7 @@ import sys
 # ==========================================
 # ⚙️ CONFIGURATION
 # ==========================================
-TEST_FOLDER = "extreme image"
+TEST_FOLDER = "testing image"
 DB_PATH = "live_video_db"
 MATCH_THRESHOLD = 0.55  # Must match your API's threshold
 

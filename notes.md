@@ -110,3 +110,10 @@ What we can do next
 3. super image resolution 
 
 
+
+
+1. night video testing 
+2. sorting 
+3. new user interface 
+4. memory usage and cpu usage parameters 
+

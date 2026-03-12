@@ -1,0 +1,215 @@
+import cv2
+import chromadb
+import uuid
+import numpy as np
+from insightface.app import FaceAnalysis
+from datetime import datetime
+import sys
+import os
+
+# ==========================================
+# CONFIGURATION
+# ==========================================
+
+VIDEO_PATH = "/home/user/Desktop/video surveillence/Sample_videos/Night videos/Export__Rly Station-Towards Amisha Hotel General_Thursday March 05 202651946  ee084f7.avi"
+
+PROCESS_EVERY_N_FRAMES = 30
+FACE_MATCH_THRESHOLD = 0.45
+
+os.environ["ORT_LOGGING_LEVEL"] = "3"
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(SCRIPT_DIR, "live_video_db")
+SAVE_FOLDER = os.path.join(SCRIPT_DIR, "captured_faces")
+
+# ==========================================
+# DATABASE
+# ==========================================
+
+print("⏳ Step 1: Connecting to ChromaDB...")
+
+try:
+    db_client = chromadb.PersistentClient(path=DB_PATH)
+
+    collection = db_client.get_or_create_collection(
+        name="face_embeddings",
+        metadata={"hnsw:space": "cosine"}
+    )
+
+    print(f"✅ ChromaDB Connected at {DB_PATH}")
+
+except Exception as e:
+    print(f"❌ ChromaDB Error: {e}")
+    sys.exit(1)
+
+# ==========================================
+# AI MODEL
+# ==========================================
+
+print("⏳ Step 2: Loading AI Models...")
+
+app = FaceAnalysis(
+    name='antelopev2',
+    providers=['CUDAExecutionProvider', 'CPUExecutionProvider']
+)
+
+app.prepare(ctx_id=0, det_size=(1024,1024))
+
+active_providers = app.models['detection'].session.get_providers()
+print(f"✅ AI System Ready. Active Provider: {active_providers[0]}")
+
+# ==========================================
+# VIDEO STREAM CLASS
+# ==========================================
+
+class VideoStream:
+
+    def __init__(self, src):
+
+        self.src = src
+        self.stream = cv2.VideoCapture(src)
+        self.frame_count = 0
+        self.stopped = False
+
+        if not self.stream.isOpened():
+            print(f"⚠️ Cannot open video file {src}")
+            self.stopped = True
+        else:
+            self.total_frames = int(self.stream.get(cv2.CAP_PROP_FRAME_COUNT))
+            print(f"✅ Video loaded successfully ({self.total_frames} frames)")
+
+    def read(self):
+
+        if self.stopped:
+            return False, None
+
+        grabbed, frame = self.stream.read()
+
+        if not grabbed:
+            print("🎬 Video finished.")
+            self.stopped = True
+            return False, None
+
+        self.frame_count += 1
+        return True, frame
+
+    def stop(self):
+
+        self.stopped = True
+        self.stream.release()
+
+# ==========================================
+# SETUP
+# ==========================================
+
+if not os.path.exists(SAVE_FOLDER):
+    os.makedirs(SAVE_FOLDER)
+
+video = VideoStream(VIDEO_PATH)
+
+print("🚀 Processing Started")
+
+# ==========================================
+# MAIN LOOP
+# ==========================================
+
+try:
+
+    while True:
+
+        grabbed, frame = video.read()
+
+        if not grabbed or frame is None:
+            break
+
+        if video.frame_count % PROCESS_EVERY_N_FRAMES != 0:
+            continue
+
+        faces = app.get(frame)
+
+        if faces:
+
+            timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            for face in faces:
+
+                if face.det_score < 0.6:
+                    continue
+
+                x1,y1,x2,y2 = face.bbox.astype(int)
+
+                y1 = max(0,y1)
+                y2 = min(frame.shape[0],y2)
+
+                x1 = max(0,x1)
+                x2 = min(frame.shape[1],x2)
+
+                face_crop = frame[y1:y2,x1:x2]
+
+                if face_crop.size == 0:
+                    continue
+
+                embedding = face.embedding.tolist()
+                person_id = None
+
+                # SEARCH IN DATABASE
+                if collection.count() > 0:
+
+                    results = collection.query(
+                        query_embeddings=[embedding],
+                        n_results=1
+                    )
+
+                    if results['distances'] and len(results['distances'][0]) > 0:
+
+                        distance = results['distances'][0][0]
+
+                        print(f"🔍 DEBUG Frame {video.frame_count}: dist={distance:.4f}")
+
+                        if distance < FACE_MATCH_THRESHOLD:
+
+                            person_id = results['metadatas'][0][0]["person_id"]
+                            print(f"✅ MATCH with {person_id}")
+
+                        else:
+                            print("❌ NO MATCH")
+
+                # CREATE NEW PERSON
+                if not person_id:
+
+                    person_id = f"person_{str(uuid.uuid4())[:8]}"
+                    print(f"🆕 NEW PERSON {person_id}")
+
+                person_folder = os.path.join(SAVE_FOLDER, person_id)
+
+                if not os.path.exists(person_folder):
+                    os.makedirs(person_folder)
+
+                img_id = str(uuid.uuid4())[:8]
+
+                filename = f"{timestamp_str}_{img_id}.jpg"
+                filepath = os.path.join(person_folder, filename)
+
+                cv2.imwrite(filepath, face_crop)
+
+                collection.add(
+
+                    ids=[str(uuid.uuid4())],
+
+                    embeddings=[embedding],
+
+                    metadatas={
+                        "person_id":person_id,
+                        "time":datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        "image_path":filepath
+                    }
+                )
+
+except KeyboardInterrupt:
+
+    print("\n🛑 Interrupted")
+
+finally:
+
+    video.stop()
+    print("System Closed")

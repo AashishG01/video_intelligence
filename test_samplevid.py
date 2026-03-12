@@ -188,7 +188,7 @@ try:
             break
 
 except KeyboardInterrupt:
-    print("\n🛑 Process interrupted by user.")
+    print("\n🛑 Process interrupted by user.gi")
 finally:
     # Ensure all video files are cleanly closed to prevent memory leaks
     vid1.stop()
