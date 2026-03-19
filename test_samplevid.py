@@ -16,6 +16,9 @@ VIDEO_PATH_2 = "/home/user/Desktop/video surveillence/Sample_videos/Export__Rly 
 VIDEO_PATH_3 = "/home/user/Desktop/video surveillence/Sample_videos/Export__MajuraGate-Towards sagrampura_Wednesday February 18 202695109  1a65bd9.avi"
 VIDEO_PATH_4 = "/home/user/Desktop/video surveillence/Sample_videos/Export__Mahidharpura Nr Temple Thoba Sheri_Friday February 20 2026114459  a430615.avi"
 
+#/home/user/Desktop/video surveillence/Sample_videos/Export__Gopi Talav-Towards Gopi Talav Gate_Saturday March 14 2026120440  6942298.avi
+#/home/user/Desktop/video surveillence/Sample_videos/Export__Zampa Bazar-Towards Air India Office_Saturday March 14 2026120139  4ece73f.avi
+
 # For recorded video, we skip frames instead of using time.sleep()
 # Assuming a 30 FPS video, setting this to 30 processes 1 frame per second of video time.
 PROCESS_EVERY_N_FRAMES = 30 
@@ -25,9 +28,13 @@ FACE_MATCH_THRESHOLD = 0.45
 
 os.environ["ORT_LOGGING_LEVEL"] = "3" 
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(SCRIPT_DIR, "live_video_db")
-SAVE_FOLDER = os.path.join(SCRIPT_DIR, "captured_faces")
+SCRIPT_DIR   = os.path.dirname(os.path.abspath(__file__))
+DATABASE_DIR = os.path.join(SCRIPT_DIR, "Database")
+DB_PATH      = os.path.join(DATABASE_DIR, "live_video_db")
+SAVE_FOLDER  = os.path.join(DATABASE_DIR, "captured_faces")
+
+os.makedirs(DB_PATH,     exist_ok=True)
+os.makedirs(SAVE_FOLDER, exist_ok=True)
 
 print("⏳ Step 1: Connecting to ChromaDB...")
 try:

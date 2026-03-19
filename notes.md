@@ -117,3 +117,99 @@ What we can do next
 3. new user interface 
 4. memory usage and cpu usage parameters 
 
+
+
+night_facecollector.py
+It reads a night video, enhances each frame to improve visibility, detects faces using AI, and saves each unique person into their own folder in a database. Video frame → enhance → detect faces → filter weak ones → check DB → save to person's folder
+
+
+Enhancements 
+Denoise 
+Gamma
+Clahe
+upscale 
+
+
+night enhancement results 
+
+test images were also enhanced 
+accuracy -> 34% 
+threshold -> 0.55
+
+==============================
+📊 BENCHMARK REPORT
+==============================
+Runtime              : 40.82 sec
+Total Frames Read    : 1510
+Frames Processed     : 50
+Processing FPS       : 1.23
+Frame Latency        : 0.8163 sec
+Faces Detected       : 2876
+Faces Saved          : 217
+
+🌙 NIGHT ENHANCEMENT  (avg ms per frame)
+  Denoise            : 10.54 ms
+  Gamma correction   : 1.62 ms
+  CLAHE              : 13.67 ms
+  Upscale (1.5x)      : 8.22 ms
+  ─────────────────────────────
+  Total enhancement  : 34.06 ms / frame
+
+🖥 CPU / RAM
+Average CPU Usage    : 3.78%
+Average RAM Usage    : 11.09%
+
+🎮 GPU Metrics
+Average GPU Usage    : 33.76%
+Average GPU Memory   : 3.01 GB
+Average GPU Power    : 171.34 W
+
+📹 ESTIMATED CAPACITY
+Camera FPS                    : 20.0
+Frames processed per camera   : 0.67
+Estimated cameras per GPU     : 1
+Camera mode                   : High-angle
+
+✅ System Closed
+
+============================================================
+📊 FINAL NIGHT PIPELINE ACCURACY REPORT
+============================================================
+Total Test Images Scanned  : 4658
+------------------------------------------------------------
+✅ Successful Matches       : 4313
+❌ Threshold Mismatches     : 148
+❌ No Face Detected         : 197
+------------------------------------------------------------
+🎯 Accuracy (all images)    : 92.59%
+🎯 Accuracy (reached DB)    : 96.68%
+============================================================
+
+
+
+
+Notes day -> 19 march 2026
+
+Final checking for streams -> stream_viewer.py 
+
+Final 4 cam working and saving data in Database folder -> final_code_4cam.py 
+
+Night_vision surveillience_with_enhancement -> test_night_single.py
+
+benchmark code for 4 live camera -> test_4camlive_benchmark.py
+
+
+
+
+night enhancement score/accuracy 
+
+============================================================
+📊 FINAL PIPELINE ACCURACY REPORT
+============================================================
+Total Test Images Scanned: 3368
+------------------------------------------------------------
+✅ Successful Matches:      3140
+❌ Failed / Mismatches:     228
+------------------------------------------------------------
+🎯 System Accuracy Rate:    93.23%
+============================================================

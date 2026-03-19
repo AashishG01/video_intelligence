@@ -26,9 +26,13 @@ FACE_MATCH_THRESHOLD = 0.45
 
 os.environ["ORT_LOGGING_LEVEL"] = "3" 
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(SCRIPT_DIR, "live_video_db")
-SAVE_FOLDER = os.path.join(SCRIPT_DIR, "captured_faces")
+SCRIPT_DIR   = os.path.dirname(os.path.abspath(__file__))
+DATABASE_DIR = os.path.join(SCRIPT_DIR, "Database")
+DB_PATH      = os.path.join(DATABASE_DIR, "live_video_db")
+SAVE_FOLDER  = os.path.join(DATABASE_DIR, "captured_faces")
+
+os.makedirs(DB_PATH,     exist_ok=True)
+os.makedirs(SAVE_FOLDER, exist_ok=True)
 
 print("⏳ Step 1: Connecting to ChromaDB...")
 try:
@@ -173,10 +177,10 @@ def process_gpu(cam_obj):
 # ==========================================
 print("line 174")
 print("🚀 Starting Stream Threads...")
-cam1 = CameraStream(RTSP_URL_1, "Cam_01").start()
-cam2 = CameraStream(RTSP_URL_2, "Cam_02").start()
-cam3 = CameraStream(RTSP_URL_3, "Cam_03").start()
-cam4 = CameraStream(RTSP_URL_4, "Cam_04").start()
+cam1 = CameraStream(RTSP_URL_1, "Lab_Cam_01").start()
+cam2 = CameraStream(RTSP_URL_2, "Lab_Cam_02").start()
+cam3 = CameraStream(RTSP_URL_3, "Lab_Cam_03").start()
+cam4 = CameraStream(RTSP_URL_4, "Department_gate").start()
 
 
 print("🟢 System Running. Press Ctrl+C to exit.")

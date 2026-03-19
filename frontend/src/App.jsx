@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import './App.css';
 
+// old frontend code 
+
 const API_BASE_URL = 'http://localhost:8000';
 
 function App() {

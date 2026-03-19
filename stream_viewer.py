@@ -1,7 +1,11 @@
 import cv2
 import numpy as np
+import os
+import threading
 
-# RTSP URLs for the four cameras
+# Force TCP transport
+os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;tcp"
+
 RTSP_URLS = [
     "rtsp://admin:admin@172.16.0.151:554/live.sdp",
     "rtsp://admin:admin@172.16.0.152:554/live.sdp",
@@ -9,66 +13,80 @@ RTSP_URLS = [
     "rtsp://admin:Admin@123@172.16.0.162:554/live.sdp"
 ]
 
-def create_placeholder_frame(width=640, height=480):
-    """Create a black placeholder frame for failed streams."""
+FRAME_WIDTH  = 640
+FRAME_HEIGHT = 480
+
+# ==========================================
+# HELPER — pehle define karo
+# ==========================================
+def create_placeholder_frame(width=FRAME_WIDTH, height=FRAME_HEIGHT):
     return np.zeros((height, width, 3), dtype=np.uint8)
 
-def main():
-    # Initialize captures for all URLs
-    caps = []
-    for i, url in enumerate(RTSP_URLS):
-        cap = cv2.VideoCapture(url)
-        if not cap.isOpened():
-            print(f"Error: Could not open video stream at {url} (Camera {i+1})")
-            caps.append(None)  # Placeholder for failed stream
-        else:
-            caps.append(cap)
-            print(f"Stream {i+1} opened successfully.")
+# Ab buffer banao — function pehle define ho chuka hai
+frame_buffer = [create_placeholder_frame() for _ in range(4)]
+buffer_lock  = threading.Lock()
 
-    # Check if at least one stream is open
-    if all(cap is None for cap in caps):
-        print("Error: No streams could be opened. Check network and credentials.")
+# ==========================================
+# Per-camera capture thread
+# ==========================================
+def capture_thread(cam_idx, url):
+    print(f"⏳ Connecting Camera {cam_idx + 1}...")
+
+    cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 2)
+
+    if not cap.isOpened():
+        print(f"❌ Camera {cam_idx + 1} could not open: {url}")
         return
 
-    print("2x2 Grid started. Press 'q' to quit.")
+    print(f"✅ Camera {cam_idx + 1} connected.")
 
-    # Define grid dimensions (adjust as needed for your display)
-    frame_width = 640
-    frame_height = 480
-    grid_width = frame_width * 2
-    grid_height = frame_height * 2
+    # Skip until first valid keyframe
+    for _ in range(30):
+        ret, frame = cap.read()
+        if ret and frame is not None:
+            break
 
     while True:
-        frames = []
-        for i, cap in enumerate(caps):
-            if cap is not None:
-                ret, frame = cap.read()
-                if ret:
-                    # Resize frame to fit quadrant
-                    frame = cv2.resize(frame, (frame_width, frame_height))
-                else:
-                    print(f"Warning: Failed to read frame from Camera {i+1}. Using placeholder.")
-                    frame = create_placeholder_frame(frame_width, frame_height)
-            else:
-                frame = create_placeholder_frame(frame_width, frame_height)
-            frames.append(frame)
+        ret, frame = cap.read()
 
-        # Arrange into 2x2 grid: Top row (frames 0-1), Bottom row (frames 2-3)
-        top_row = np.hstack([frames[0], frames[1]])
+        if not ret or frame is None:
+            print(f"⚠️  Camera {cam_idx + 1}: Frame read failed, reconnecting...")
+            cap.release()
+            cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
+            cap.set(cv2.CAP_PROP_BUFFERSIZE, 2)
+            continue
+
+        resized = cv2.resize(frame, (FRAME_WIDTH, FRAME_HEIGHT))
+
+        with buffer_lock:
+            frame_buffer[cam_idx] = resized
+
+# ==========================================
+# MAIN
+# ==========================================
+def main():
+    threads = []
+    for i, url in enumerate(RTSP_URLS):
+        t = threading.Thread(target=capture_thread, args=(i, url), daemon=True)
+        t.start()
+        threads.append(t)
+
+    print("🟢 2x2 Grid started. Press 'q' to quit.")
+
+    while True:
+        with buffer_lock:
+            frames = [f.copy() for f in frame_buffer]
+
+        top_row    = np.hstack([frames[0], frames[1]])
         bottom_row = np.hstack([frames[2], frames[3]])
-        grid = np.vstack([top_row, bottom_row])
+        grid       = np.vstack([top_row, bottom_row])
 
-        # Display the grid
         cv2.imshow('2x2 RTSP Grid', grid)
 
-        # Press 'q' to exit
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    # Cleanup
-    for cap in caps:
-        if cap is not None:
-            cap.release()
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
