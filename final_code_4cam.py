@@ -177,9 +177,9 @@ def process_gpu(cam_obj):
 # ==========================================
 print("line 174")
 print("🚀 Starting Stream Threads...")
-cam1 = CameraStream(RTSP_URL_1, "Lab_Cam_01").start()
-cam2 = CameraStream(RTSP_URL_2, "Lab_Cam_02").start()
-cam3 = CameraStream(RTSP_URL_3, "Lab_Cam_03").start()
+# cam1 = CameraStream(RTSP_URL_1, "Lab_Cam_01").start()
+# cam2 = CameraStream(RTSP_URL_2, "Lab_Cam_02").start()
+# cam3 = CameraStream(RTSP_URL_3, "Lab_Cam_03").start()
 cam4 = CameraStream(RTSP_URL_4, "Department_gate").start()
 
 
@@ -187,15 +187,15 @@ print("🟢 System Running. Press Ctrl+C to exit.")
 
 try:
     while True:
-        process_gpu(cam1)
-        process_gpu(cam2)
-        process_gpu(cam3)
+        # process_gpu(cam1)
+        # process_gpu(cam2)
+        # process_gpu(cam3)
         process_gpu(cam4)
 
         time.sleep(0.01) 
 except KeyboardInterrupt:
     print("\n🛑 Shutting down...")
-    cam1.stop()
-    cam2.stop()
-    cam3.stop()
+    # cam1.stop()
+    # cam2.stop()
+    # cam3.stop()
     cam4.stop()

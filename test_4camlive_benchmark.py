@@ -20,7 +20,7 @@ RTSP_URL_3 = "rtsp://admin:123456@172.16.0.161:554/live.sdp"
 RTSP_URL_4 = "rtsp://admin:Admin@123@172.16.0.162:554/live.sdp"
 
 PROCESS_INTERVAL     = 1.0
-FACE_MATCH_THRESHOLD = 0.45
+FACE_MATCH_THRESHOLD = 0.6
 RUN_DURATION_SECONDS = 120  # 2 minutes
 
 os.environ["ORT_LOGGING_LEVEL"] = "3"

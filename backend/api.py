@@ -81,7 +81,7 @@ face_app.models['detection'].det_thresh = 0.10
 
 print("✅ InsightFace Ready — Detection + Embedding extraction active.")
 
-# ==========================================
+# ==========================================ew
 # CAMERA STREAM FUNCTIONS
 # ==========================================
 def capture_camera(cam_id, rtsp_url):
